@@ -4,10 +4,8 @@
 
 ## Team
 
-- Name 1 Attalah (Team Leader)
+- Name 1 Atalah (Team Leader)
 - Name 2 Fahry
-- Name 3
-- Name 4
 
 ## Project Overview
 
