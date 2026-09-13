@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large data files (keep DB local, don't commit to GitHub)
+*.sqlite
+*.db
+
+# Model files (optional - remove this line if you DO want to commit trained models)
+# model/*.pkl
+# model/*.joblib
