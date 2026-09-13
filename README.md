@@ -4,8 +4,8 @@
 
 ## Team
 
-- Name 1 — Team Leader
-- Name 2
+- Name 1 Attalah (Team Leader)
+- Name 2 Fahry
 - Name 3
 - Name 4
 
