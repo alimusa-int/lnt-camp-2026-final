@@ -15,8 +15,8 @@
 
 We selected the following 2 of 3 tasks:
 
-- [ ] Regression — predicting `___`
-- [ ] Classification — predicting `___`
+- [ - ] Regression — predicting `___`
+- [ - ] Classification — predicting `___`
 - [ ] Clustering — segmenting `___`
 
 ## Folder Structure
