@@ -11,9 +11,22 @@ def load_assets():
     # Pastikan path ini sesuai dengan struktur folder lu saat ditaruh di GitHub
     clf = joblib.load("model/classification_model.pkl") 
     reg = joblib.load("model/regression_model.pkl")
-    return clf, reg
+    fitur_model_asli = joblib.load("model/feature_columns.pkl")
+    return clf, reg, fitur_model_asli
 
-clf_model, reg_model = load_assets()
+clf_model, reg_model, fitur_model_asli = load_assets()
+
+# Kategori diskon HARUS sama persis dengan fungsi categorize_discount() di notebook
+# (Bagian 4: Preprocessing / Feature Engineering) agar hasil binning konsisten dengan training.
+def categorize_discount(d):
+    if d == 0:
+        return "No Discount"
+    elif d <= 0.15:
+        return "Low (<=15%)"
+    elif d <= 0.30:
+        return "Medium (16-30%)"
+    else:
+        return "High (>30%)"
 
 # --- UI FRONTEND ---
 st.title("🛒 Superstore Profit Predictor")
@@ -39,28 +52,20 @@ if submitted:
     
     with st.spinner("Mesin AI sedang menganalisis data..."):
         try:
-            # A. Buat DataFrame dari input
+            # A. Buat DataFrame dari input (nama kolom huruf kecil, sesuai training)
             input_data = pd.DataFrame([{
-                "Quantity": quantity,
-                "Discount": discount_decimal,
-                "Shipping Cost": shipping_cost,
-                "Ship Mode": ship_mode
+                "quantity": quantity,
+                "discount": discount_decimal,
+                "shipping_cost": shipping_cost,
+                "discount_tier": categorize_discount(discount_decimal),
+                "ship_mode": ship_mode
             }])
 
-            # B. One-Hot Encoding
-            input_encoded = pd.get_dummies(input_data)
-            
-            # C. Samakan struktur kolom persis saat training (Fitur asli dari model lu)
-            fitur_model_asli = [
-                "Quantity", 
-                "Discount", 
-                "Shipping Cost", 
-                "Ship Mode_First Class", 
-                "Ship Mode_Same Day", 
-                "Ship Mode_Second Class", 
-                "Ship Mode_Standard Class"
-            ]
-            
+            # B. One-Hot Encoding (kolom kategorikal sama seperti saat training: discount_tier & ship_mode)
+            input_encoded = pd.get_dummies(input_data, columns=["discount_tier", "ship_mode"])
+
+            # C. Samakan struktur kolom persis saat training
+            # (diambil dari model/feature_columns.pkl, bukan hardcode, biar selalu sinkron dengan model)
             input_final = input_encoded.reindex(columns=fitur_model_asli, fill_value=0)
 
             # D. Eksekusi Prediksi (Tanpa API FastAPI)
