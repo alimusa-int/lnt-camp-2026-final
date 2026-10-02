@@ -15,7 +15,7 @@ This project serves as a Decision Support System for retail managers to evaluate
 
 We selected the following 2 of 3 tasks:
 
-- [x] Regression — predicting `Sales` (Estimating order omzet)
+- [x] Regression — predicting `Sales` (Estimating order volume)
 - [x] Classification — predicting `Profitability Status` (Safe vs. High Risk)
 - [ ] Clustering — segmenting `___`
 
