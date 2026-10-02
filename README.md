@@ -4,66 +4,58 @@
 
 ## Team
 
-- Name 1 Atalah (Team Leader)
-- Name 2 Fahry
+- Muhamad Atallah Alimusa (Team Leader)
+- Muhammad Fahry Fauzi
 
 ## Project Overview
 
-<!-- 2-3 sentences: what the project does and the business question it answers -->
+This project serves as a Decision Support System for retail managers to evaluate customer baskets at the order level. It projects potential sales volume and acts as a risk mitigation gatekeeper by flagging potentially unprofitable transactions before they are processed.
 
 ## Chosen Modelling Tasks
 
 We selected the following 2 of 3 tasks:
 
-- [ - ] Regression — predicting `___`
-- [ - ] Classification — predicting `___`
+- [x] Regression — predicting `Sales` (Estimating order volume)
+- [x] Classification — predicting `Profitability Status` (Safe vs. High Risk)
 - [ ] Clustering — segmenting `___`
 
 ## Folder Structure
 
+*Note: The architecture was adapted into a Monolithic Streamlit Application for deployment efficiency.*
+
 ```
 notebook/   Jupyter notebook (EDA, preprocessing, modelling) + data loading instructions
-model/      Saved trained model files (.pkl / .joblib) and training scripts
-backend/    REST API (prediction endpoints)
-frontend/   Simulation app (user inputs -> backend -> prediction shown)
+model/      Saved trained model files (.pkl) and feature columns reference
+app.py      Main Streamlit application (Frontend + Embedded Prediction Logic)
 ```
 
 ## Dataset
 
-This project uses the Global Superstore dataset, restructured into a normalised SQLite database (`superstore.sqlite`). See `notebook/` for the schema and loading queries.
+This project uses the Global Superstore dataset, restructured into a normalised SQLite database (superstore.sqlite). See notebook/ for the schema and loading queries.
 
 ## Setup & Run — Backend
 
-```bash
-cd backend
-pip install -r requirements.txt
-# start command here, e.g.:
-uvicorn main:app --reload
-```
-
-Endpoints:
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/health` | Health check |
-| POST | `/predict/...` | ... |
-
-## Setup & Run — Frontend
+*Note: The frontend and backend prediction logic are integrated into a single monolithic Streamlit app. No separate REST API or backend setup is required.*
 
 ```bash
-cd frontend
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Deployed app: `<link here>`
+Deployed app: `https://lnt-camp-2026-final-e73ddpomrtnufvkuhqj6y2.streamlit.app`
 
 ## Deployed Links
 
-- Frontend: `<link>`
-- Backend (if deployed): `<link>`
+- Frontend: `<https://lnt-camp-2026-final-e73ddpomrtnufvkuhqj6y2.streamlit.app>`
+- Backend (if deployed): `<N/A (Monolithic Architecture)>`
 - LinkedIn post: `<link>`
 
 ## Key Findings
 
-<!-- 3-5 bullet business insights from the notebook -->
+- High Discounts Drive Consistent Losses: Transactions with discount rates exceeding 30% consistently result in negative profit margins, regardless of the order quantity.
+
+- Furniture is the Most Vulnerable Category: The Furniture category has the lowest profitability win-rate (~67%) compared to Office Supplies and Technology (~74-76%).
+
+- Lagging Profit Growth: Trend analysis from 2011 to 2014 shows that while total sales nearly doubled, profit growth lagged significantly, indicating margins are being eroded by aggressive discounting.
+
+- Logistics as a Strong Proxy: Operational logistics metrics (shipping_cost, quantity, ship_mode, and discount_tier) proved to be highly effective proxy variables for the AI to estimate sales volume without unit prices.
