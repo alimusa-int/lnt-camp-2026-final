@@ -1,4 +1,7 @@
-streamlit
-pandas
-joblib
-scikit-learn
+streamlit>=1.40
+pandas==3.0.2
+scikit-learn==1.8.0
+joblib==1.5.3
+# Hanya dipakai notebook (EDA/grafik):
+matplotlib==3.10.8
+seaborn==0.13.2

@@ -16,8 +16,8 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Large data files (keep DB local, don't commit to GitHub)
-*.sqlite
+# Database: notebook/superstore.sqlite (~11 MB) SENGAJA ikut di-commit agar notebook bisa dijalankan ulang.
+# Ignore database lain yang mungkin dibuat saat eksperimen:
 *.db
 
 # Model files (optional - remove this line if you DO want to commit trained models)
