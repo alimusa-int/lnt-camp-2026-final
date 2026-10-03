@@ -94,10 +94,12 @@ if submitted:
                 col3.metric(label="Estimasi Nilai Omzet (Sales)", value=f"${sales_pred:,.2f}")
                 col4.metric(label="Probabilitas Keuntungan", value=f"{profit_proba:.2f}%")
 
-                if profit_pred == 1:
-                    st.success("✅ **Rekomendasi:** Safe to Process. Transaksi ini diprediksi menguntungkan.")
+                if profit_proba >= 70.0:
+                    st.success("✅ **Rekomendasi:** Safe to Process. Transaksi ini diprediksi menguntungkan dengan keyakinan tinggi.")
+                elif 50.0 <= profit_proba < 70.0:
+                    st.warning("⚠️ **Rekomendasi:** Review Manual (Ragu). Probabilitas keuntungan marginal. Tinjau ulang besaran diskon agar tidak boncos.")
                 else:
-                    st.error("⚠️ **Rekomendasi:** High Risk! Potensi rugi tinggi. Tinjau ulang diskon atau komposisi keranjang.")
+                    st.error("🚨 **Rekomendasi:** High Risk! Potensi rugi tinggi. Segera tinjau ulang diskon atau komposisi keranjang.")
 
                 st.caption(
                     "Catatan: estimasi Sales sangat dipengaruhi ongkos kirim, sehingga diasumsikan ongkir sudah "
