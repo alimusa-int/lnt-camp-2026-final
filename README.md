@@ -35,8 +35,6 @@ notebook/   Jupyter notebook (EDA, preprocessing, modelling) + superstore.sqlite
 model/      Model terlatih (.pkl) dan daftar kolom fitur
 backend/    REST API (FastAPI): main.py + requirements.txt
 frontend/   Aplikasi Streamlit: app.py + requirements.txt
-Dockerfile   Image backend untuk Hugging Face Spaces
-hf_space/    README (metadata Space) + deploy.sh untuk push backend ke HF
 ```
 
 ## Dataset
@@ -107,7 +105,7 @@ pip install -r frontend/requirements.txt
 BACKEND_URL=http://localhost:8000 streamlit run frontend/app.py
 ```
 
-(Di Windows PowerShell: `$env:BACKEND_URL="http://localhost:8000"; streamlit run frontend/app.py`.) Bila `BACKEND_URL` tidak diatur, frontend memakai `http://localhost:8000`. Untuk deployment, isi `BACKEND_URL` lewat Streamlit secrets (lihat contoh di `frontend/.streamlit/secrets.toml.example`).
+(Di Windows PowerShell: `$env:BACKEND_URL="http://localhost:8000"; streamlit run frontend/app.py`.) Bila `BACKEND_URL` tidak diatur, frontend memakai `http://localhost:8000`. Di Streamlit Cloud, `BACKEND_URL` tidak perlu diisi (backend dinyalakan otomatis); isi hanya bila memakai backend eksternal (lihat `frontend/.streamlit/secrets.toml.example`).
 
 Frontend punya dua halaman simulasi: **Klasifikasi: Risiko Profit** dan **Regresi: Estimasi Sales**.
 
@@ -194,27 +192,20 @@ Output:
 
 ## Deployment
 
-Frontend yang dipublikasikan tidak bisa memanggil backend yang berjalan di laptop, jadi backend perlu di-deploy juga.
+Seluruh aplikasi di-deploy di **Streamlit Community Cloud** (satu container berisi frontend dan backend). Saat frontend dibuka, `frontend/app.py` mengecek `BACKEND_URL` (default `http://localhost:8000`). Bila backend belum berjalan, frontend menyalakan `uvicorn backend.main:app` sebagai proses terpisah di container yang sama. Frontend tetap hanya memanggil API lewat HTTP, dan model dimuat oleh backend dari `model/` (tanpa retraining).
 
-**Backend (Hugging Face Spaces, Docker):**
+1. Push repo ke GitHub (publik).
+2. Di share.streamlit.io, **Create app**: pilih repo, branch `main`, **Main file path** `frontend/app.py`.
+3. **Advanced settings**: pilih Python **3.12** (minimal 3.11, karena `pandas` 3.x). Tidak perlu mengisi Secrets.
+4. Deploy. Dependensi frontend dan backend dipasang dari `frontend/requirements.txt`.
+5. Buka app, lalu klik **Cek koneksi backend** di sidebar. Harus muncul "Backend aktif".
 
-1. Buat akun di huggingface.co, lalu **New Space** (SDK: **Docker**, hardware: CPU basic - free). Buat juga Access Token dengan izin *write* di Settings > Access Tokens.
-2. Dari root repo jalankan (butuh `git` dan `git-lfs`):
-   `HF_USER=<username> HF_SPACE=<nama-space> HF_TOKEN=hf_xxx bash hf_space/deploy.sh`
-   Script merakit `Dockerfile`, `backend/`, dan `model/` ke repo Space (file `.pkl` > 10 MB dikirim lewat Git LFS) lalu push.
-3. Tunggu build selesai (tab **Logs**), lalu buka `https://<username>-<nama-space>.hf.space/health` - statusnya harus `ok`. Dokumentasi endpoint ada di `/docs`.
-4. Space gratis bisa tidur saat tidak aktif, sehingga request pertama bisa butuh beberapa menit. Buka `/health` terlebih dahulu sebelum demo.
-
-**Frontend (Streamlit Community Cloud):**
-
-1. Buat/ubah app dengan **Main file path** `frontend/app.py`.
-2. Di **Settings > Secrets**, isi: `BACKEND_URL = "https://<username>-<nama-space>.hf.space"`.
-3. Reboot app.
+Backend juga bisa dijalankan terpisah di server lain: jalankan `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`, lalu isi `BACKEND_URL` di Secrets Streamlit. Frontend akan memakai URL itu dan tidak menyalakan backend sendiri.
 
 ## Deployed Links
 
 - Frontend: `https://lnt-camp-2026-final-e73ddpomrtnufvkuhqj6y2.streamlit.app`
-- Backend: _isi URL Hugging Face Space setelah deploy_ (cek `/health` dan `/docs`)
+- Backend: berjalan di container yang sama dengan frontend (API dipanggil frontend lewat HTTP; lihat bagian Deployment)
 - LinkedIn post: _belum diisi_
 
 ## Key Findings

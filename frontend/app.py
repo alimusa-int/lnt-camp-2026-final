@@ -4,9 +4,19 @@ Frontend HANYA menampilkan form dan hasil. Semua prediksi dilakukan oleh Backend
 (lihat backend/main.py) lewat HTTP. URL backend dibaca dari:
   1. environment variable BACKEND_URL, atau
   2. Streamlit secrets (BACKEND_URL = "https://...") , atau
-  3. default http://localhost:8000 (untuk pengembangan lokal).
+  3. default http://localhost:8000 (pengembangan lokal / deploy satu container).
+
+Jika BACKEND_URL mengarah ke localhost dan backend belum berjalan, frontend otomatis
+menyalakan backend FastAPI (uvicorn backend.main:app) sebagai proses terpisah di container
+yang sama. Dengan begitu deploy cukup di Streamlit Community Cloud, tanpa layanan hosting lain.
+Frontend tetap hanya memanggil API lewat HTTP; model tidak dimuat di proses Streamlit.
 """
 import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+from urllib.parse import urlparse
 
 import requests
 import streamlit as st
@@ -14,7 +24,7 @@ import streamlit as st
 st.set_page_config(page_title="Superstore Profit Predictor", page_icon="📈", layout="centered")
 
 SHIP_MODES = ["Standard Class", "Second Class", "First Class", "Same Day"]
-REQUEST_TIMEOUT = 90  # detik; backend gratis (mis. Hugging Face Spaces) bisa butuh waktu saat "bangun" dari tidur
+REQUEST_TIMEOUT = 90  # detik; backend eksternal gratis bisa butuh waktu saat "bangun" dari tidur
 
 
 def get_backend_url() -> str:
@@ -28,6 +38,37 @@ def get_backend_url() -> str:
 
 
 BACKEND_URL = get_backend_url()
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+
+def _backend_sehat(url: str) -> bool:
+    try:
+        return requests.get(f"{url}/health", timeout=3).ok
+    except requests.exceptions.RequestException:
+        return False
+
+
+@st.cache_resource(show_spinner="Menyalakan backend API...")
+def pastikan_backend(url: str) -> bool:
+    """Nyalakan backend lokal bila URL-nya localhost dan belum berjalan. Return True bila sehat."""
+    if _backend_sehat(url):
+        return True
+    parsed = urlparse(url)
+    if parsed.hostname not in ("localhost", "127.0.0.1"):
+        return False  # backend eksternal: tidak kita kelola
+    subprocess.Popen(
+        [sys.executable, "-m", "uvicorn", "backend.main:app", "--host", "127.0.0.1",
+         "--port", str(parsed.port or 8000)],
+        cwd=ROOT_DIR,
+    )
+    for _ in range(60):  # tunggu hingga model selesai dimuat (maks ±60 detik)
+        time.sleep(1)
+        if _backend_sehat(url):
+            return True
+    return False
+
+
+pastikan_backend(BACKEND_URL)
 
 
 # ---------- Komunikasi dengan backend ----------
