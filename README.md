@@ -206,7 +206,7 @@ Backend juga bisa dijalankan terpisah di server lain: jalankan `uvicorn backend.
 
 - Frontend: `https://lnt-camp-2026-final-yg6v7mhkvfnhthptgg4rnp.streamlit.app`
 - Backend: berjalan di container yang sama dengan frontend (API dipanggil frontend lewat HTTP; lihat bagian Deployment)
-- LinkedIn post: _belum diisi_
+- LinkedIn post: 'https://lnkd.in/p/gj_RpPiC'
 
 ## Key Findings
 
