@@ -35,7 +35,8 @@ notebook/   Jupyter notebook (EDA, preprocessing, modelling) + superstore.sqlite
 model/      Model terlatih (.pkl) dan daftar kolom fitur
 backend/    REST API (FastAPI): main.py + requirements.txt
 frontend/   Aplikasi Streamlit: app.py + requirements.txt
-render.yaml Konfigurasi deploy backend di Render (opsional)
+Dockerfile   Image backend untuk Hugging Face Spaces
+hf_space/    README (metadata Space) + deploy.sh untuk push backend ke HF
 ```
 
 ## Dataset
@@ -195,22 +196,25 @@ Output:
 
 Frontend yang dipublikasikan tidak bisa memanggil backend yang berjalan di laptop, jadi backend perlu di-deploy juga.
 
-**Backend (Render):**
+**Backend (Hugging Face Spaces, Docker):**
 
-1. Push repo ke GitHub, lalu di Render pilih **New > Blueprint** dan arahkan ke repo ini (membaca `render.yaml`). Atau buat **Web Service** manual dengan: Build Command `pip install -r backend/requirements.txt`, Start Command `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`, dan environment variable `PYTHON_VERSION=3.12.3`.
-2. Setelah deploy, buka `https://<nama-service>.onrender.com/health` untuk memastikan statusnya `ok`.
-3. Paket gratis Render "tidur" setelah tidak aktif, sehingga request pertama bisa butuh ±1 menit. Buka `/health` terlebih dahulu sebelum demo.
+1. Buat akun di huggingface.co, lalu **New Space** (SDK: **Docker**, hardware: CPU basic - free). Buat juga Access Token dengan izin *write* di Settings > Access Tokens.
+2. Dari root repo jalankan (butuh `git` dan `git-lfs`):
+   `HF_USER=<username> HF_SPACE=<nama-space> HF_TOKEN=hf_xxx bash hf_space/deploy.sh`
+   Script merakit `Dockerfile`, `backend/`, dan `model/` ke repo Space (file `.pkl` > 10 MB dikirim lewat Git LFS) lalu push.
+3. Tunggu build selesai (tab **Logs**), lalu buka `https://<username>-<nama-space>.hf.space/health` - statusnya harus `ok`. Dokumentasi endpoint ada di `/docs`.
+4. Space gratis bisa tidur saat tidak aktif, sehingga request pertama bisa butuh beberapa menit. Buka `/health` terlebih dahulu sebelum demo.
 
 **Frontend (Streamlit Community Cloud):**
 
 1. Buat/ubah app dengan **Main file path** `frontend/app.py`.
-2. Di **Settings > Secrets**, isi: `BACKEND_URL = "https://<nama-service>.onrender.com"`.
+2. Di **Settings > Secrets**, isi: `BACKEND_URL = "https://<username>-<nama-space>.hf.space"`.
 3. Reboot app.
 
 ## Deployed Links
 
 - Frontend: `https://lnt-camp-2026-final-e73ddpomrtnufvkuhqj6y2.streamlit.app`
-- Backend: _isi URL Render setelah deploy_ (cek `/health` dan `/docs`)
+- Backend: _isi URL Hugging Face Space setelah deploy_ (cek `/health` dan `/docs`)
 - LinkedIn post: _belum diisi_
 
 ## Key Findings

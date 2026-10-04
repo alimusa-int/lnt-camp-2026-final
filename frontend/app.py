@@ -14,7 +14,7 @@ import streamlit as st
 st.set_page_config(page_title="Superstore Profit Predictor", page_icon="📈", layout="centered")
 
 SHIP_MODES = ["Standard Class", "Second Class", "First Class", "Same Day"]
-REQUEST_TIMEOUT = 90  # detik; backend gratis (mis. Render) bisa butuh waktu saat "bangun" dari tidur
+REQUEST_TIMEOUT = 90  # detik; backend gratis (mis. Hugging Face Spaces) bisa butuh waktu saat "bangun" dari tidur
 
 
 def get_backend_url() -> str:
