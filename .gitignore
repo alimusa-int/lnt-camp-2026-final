@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+*.env
+secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database: notebook/superstore.sqlite (~11 MB) SENGAJA ikut di-commit agar notebook bisa dijalankan ulang.
+# Ignore database lain yang mungkin dibuat saat eksperimen:
+*.db
+
+# Model files (optional - remove this line if you DO want to commit trained models)
+# model/*.pkl
+# model/*.joblib

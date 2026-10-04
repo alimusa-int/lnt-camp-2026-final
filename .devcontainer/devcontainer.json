@@ -1,0 +1,38 @@
+{
+  "name": "Python 3",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "backend/main.py",
+        "frontend/app.py"
+      ]
+    },
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  },
+  "updateContentCommand": "pip3 install --user -r backend/requirements.txt -r frontend/requirements.txt; echo 'Packages installed'",
+  "postAttachCommand": {
+    "backend": "uvicorn backend.main:app --port 8000",
+    "frontend": "BACKEND_URL=http://localhost:8000 streamlit run frontend/app.py --server.enableCORS false --server.enableXsrfProtection false"
+  },
+  "portsAttributes": {
+    "8000": {
+      "label": "Backend API"
+    },
+    "8501": {
+      "label": "Frontend",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "forwardPorts": [
+    8000,
+    8501
+  ]
+}
